@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: hello-demo-eureka
+
+server:
+  port: 8761
+
+eureka:
+  instance:
+    # 当ip 为localhost 或者是127.0.0.1时，无法进行相互注册，可以通过修改host文件使用别的字符替代
+    hostname: localhost
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    serviceUrl:
+      defaultZone: http://localhost:8762/eureka/
+
+# 我们的服务实例并不一定会正常下线，可能由于内存溢出、网络故障等原因使得服务不能正常工作，而此时服务注册中心并未收到“服务下线”
+# 请求，为了从服务列表中将这些无法提供服务的实例剔除，Eureka Server会创建一个定时任务，默认每隔一段时间（默认为60秒）将当前清单
+# 中超时（默认为90秒）没有续约的服务剔除；
+# 当我们在本地调试基于Eureka的程序时，基本上都会碰到这样一个问题，在服务注册中心的信息面板上出现一行红色警告信息，实际上该警告就
+# 是触发了Eureka Server的自我保护机制，Eureka Server在运行期间，会统计心跳失败的比例在15分钟之内是否低于85%，如果低于，则进入自我
+# 保护模式，在这段自我保护期间内实例若出现问题，那么客户端很容易拿到已经不存在的服务实例，会出现调用失败的情况，所以客户端必须要有
+# 容错机制；所以我们在本地开发时，可以使用eureka.server.enable-self-preservation=false,来关闭保护机制
